@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  ai:
+    build:
+      context: ./services/ai
+    ports:
+      - "3005:3000"
+
+  auth:
+    build:
+      context: ./services/auth
+    ports:
+      - "3001:3000"
+
+  crm:
+    build:
+      context: ./services/crm
+    ports:
+      - "3002:3000"
+  
+  document:
+    build:
+      context: ./services/document
+    ports:
+      - "3004:3000"
+  
+  task:
+    build:
+      context: ./services/task
+    ports:
+      - "3003:3000"
