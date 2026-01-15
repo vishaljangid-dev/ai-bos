@@ -1,1 +1,1 @@
-# ai-bos
+AI-BOS is a cloud-based platform that combines CRM, task management, document intelligence, and AI assistants to help companies run operations.
