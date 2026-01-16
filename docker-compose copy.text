@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  # -----------------------------
+  # Databases
+  # -----------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: ai-bos-postgres
+    environment:
+      POSTGRES_DB: ai_bos
+      POSTGRES_USER: ai_user
+      POSTGRES_PASSWORD: ai_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: ai-bos-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+
+
+  ai:
+    build:
+      context: ./services/ai
+    ports:
+      - "3005:3000"
+
+  auth:
+    build:
+      context: ./services/auth
+    ports:
+      - "3001:3000"
+
+  crm:
+    build:
+      context: ./services/crm
+    ports:
+      - "3002:3000"
+  
+  document:
+    build:
+      context: ./services/document
+    ports:
+      - "3004:3000"
+  
+  task:
+    build:
+      context: ./services/task
+    ports:
+      - "3003:3000"

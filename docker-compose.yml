@@ -1,32 +1,88 @@
-version: "3.9"
-
 services:
+  # -----------------------------
+  # Databases
+  # -----------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: ai-bos-postgres
+    environment:
+      POSTGRES_DB: ai_bos
+      POSTGRES_USER: ai_user
+      POSTGRES_PASSWORD: ai_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: ai-bos-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  # -----------------------------
+  # Microservices
+  # -----------------------------
   ai:
-    build:
-      context: ./services/ai
+    build: ./services/ai
+    container_name: ai-bos-ai
     ports:
       - "3005:3000"
+    environment:
+      PORT: 3000
+      REDIS_HOST: redis
+      DB_HOST: postgres
+    depends_on:
+      - postgres
+      - redis
 
   auth:
-    build:
-      context: ./services/auth
+    build: ./services/auth
+    container_name: ai-bos-auth
     ports:
       - "3001:3000"
+    environment:
+      PORT: 3000
+      REDIS_HOST: redis
+      DB_HOST: postgres
+    depends_on:
+      - postgres
+      - redis
 
   crm:
-    build:
-      context: ./services/crm
+    build: ./services/crm
+    container_name: ai-bos-crm
     ports:
       - "3002:3000"
-  
+    environment:
+      PORT: 3000
+      DB_HOST: postgres
+    depends_on:
+      - postgres
+
   document:
-    build:
-      context: ./services/document
+    build: ./services/document
+    container_name: ai-bos-document
     ports:
       - "3004:3000"
-  
+    environment:
+      PORT: 3000
+      DB_HOST: postgres
+    depends_on:
+      - postgres
+
   task:
-    build:
-      context: ./services/task
+    build: ./services/task
+    container_name: ai-bos-task
     ports:
       - "3003:3000"
+    environment:
+      PORT: 3000
+      REDIS_HOST: redis
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:

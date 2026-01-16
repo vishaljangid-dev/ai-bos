@@ -1,0 +1,42 @@
+name: CI - NestJS Microservices
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies (all services)
+        run: |
+          for dir in services/*; do
+            echo "Installing deps for $dir"
+            cd $dir
+            npm install
+            cd -
+          done
+
+      - name: Build services
+        run: |
+          for dir in services/*; do
+            echo "Building $dir"
+            cd $dir
+            npm run build
+            cd -
+          done
+
+      - name: Docker Compose Build
+        run: docker compose build
